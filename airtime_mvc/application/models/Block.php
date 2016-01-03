@@ -1313,15 +1313,22 @@ SQL;
             $id = $iterator->current()->getDbId();
             $fileLength = $iterator->current()->getCueLength();
             $length = Application_Common_DateHelper::calculateLengthInSeconds($fileLength);
+	    // need to check to determine if the track will make the playlist exceed the totalTime before adding it
+	    // this can be quite processor consuming so as a workaround I used the totalItems limit to prevent the algorithm from parsing too long.
+            $projectedTime = $totalTime + $length;
+	    if ($projectedTime > $limit['time']) {
+		$totalItems++;
+		}
+	    else { 
             $insertList[] = array('id'=>$id, 'length'=>$length);
             $totalTime += $length;
             $totalItems++;
-            
+            } 
             if ((!is_null($limit['items']) && $limit['items'] == count($insertList)) || $totalItems > 500 || $totalTime > $limit['time']) {
                 $isBlockFull = true;
                 break;
             }
-
+	    
             $iterator->next();
         }
         
@@ -1517,27 +1524,24 @@ SQL;
                     $i++;
                 }
             }
-
+            
             // check if file exists
             $qry->add("file_exists", "true", Criteria::EQUAL);
             $qry->add("hidden", "false", Criteria::EQUAL);
-            $sortTracks = 'random';
-            if (isset($storedCrit['sort'])) {
-                $sortTracks = $storedCrit['sort']['value'];
-            }
-            if ($sortTracks == 'newest') {
-                $qry->addDescendingOrderByColumn('utime');
-            }
-            else if ($sortTracks == 'oldest') {
-                $qry->addAscendingOrderByColumn('utime');
-            }
-            else if ($sortTracks == 'random') {
-                $qry->addAscendingOrderByColumn('random()');
-            } else {
-                Logging::warning("Unimplemented sortTracks type in ".__FILE__);
-            }
-
+        if (isset($storedCrit['sort'])) {
+            $sortTracks = $storedCrit['sort']['value'];
         }
+        if ($sortTracks == 'newest') {
+            $qry->addDescendingOrderByColumn('utime');
+        }
+        else if ($sortTracks == 'oldest') {
+            $qry->addAscendingOrderByColumn('utime');
+        }
+        else {
+            $qry->addAscendingOrderByColumn('random()');
+        }
+
+    }
         // construct limit restriction
         $limits = array();
         
