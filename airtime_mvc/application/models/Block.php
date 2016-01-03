@@ -1537,6 +1537,18 @@ SQL;
         else if ($sortTracks == 'oldest') {
             $qry->addAscendingOrderByColumn('utime');
         }
+	else if ($sortTracks == 'mostrecentlyplayed') {
+	    $qry->addAscendingOrderByColumn('lptime');
+        }
+	else if ($sortTracks == 'leastrecentlyplayed') {
+            $qry->addDescendingOrderByColumn('lptime');
+        }
+	else if ($sortTracks == 'mostrecentlymodified') {
+            $qry->addAscendingOrderByColumn('mtime');
+        }
+	else if ($sortTracks == 'leastrecentlymodified') {
+            $qry->addDescendingOrderByColumn('mtime');
+        }
         else {
             $qry->addAscendingOrderByColumn('random()');
         }

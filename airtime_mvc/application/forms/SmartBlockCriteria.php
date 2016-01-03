@@ -129,7 +129,11 @@ class Application_Form_SmartBlockCriteria extends Zend_Form_SubForm
             $this->sortOptions = array(
                 "random"   => _("random"),
                 "newest" => _("newest"),
-                "oldest"   => _("oldest")
+                "oldest"   => _("oldest"),
+		"mostrecentlyplayed" => _("most recently played"),
+		"leastrecentlyplayed" => _("least recently played"),
+		"mostrecentlymodified" => _("most recently modified"),
+		"leastrecentlymodified" => _("least recently modified")
             );
         }
         return $this->sortOptions;
